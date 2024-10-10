@@ -1,19 +1,33 @@
-import React from 'react';
-import { IFase } from '../../interfaces/IFase';
-import FaseItem from './FaseItem';
+import { estudiantesData } from '../../Data/estudiantesData';
 
-const fasesData: IFase[] = [
-  { horas: 144, creditos: 144, fase: 'Diseño' },
-  { horas: 144, creditos: 144, fase: 'Resultados' },
-];
-
-const FaseList: React.FC = () => {
+const FaseList = () => {
   return (
     <div>
-      <h2>Fases de Estudiantes</h2>
-      {fasesData.map((fase: IFase, index: number) => (
-        <FaseItem key={index} fase={fase} />
-      ))}
+      <h2>Lista de Estudiantes y sus Fases</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Carrera</th>
+            <th>Teléfono</th>
+            <th>Fase</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {estudiantesData.map((est) => (
+            <tr key={est.id}>
+              <td>{est.id}</td>
+              <td>{est.nombre}</td>
+              <td>{est.carrera}</td>
+              <td>{est.telefono}</td>
+              <td>{est.fase}</td>
+              <td>{est.activo ? 'Activo' : 'Inactivo'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

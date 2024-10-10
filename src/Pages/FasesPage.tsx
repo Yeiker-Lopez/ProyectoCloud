@@ -1,10 +1,12 @@
-import React from 'react';
+import BuscarEstudiante from '../components/Estudiante/BuscarEstudiante';
 import FaseList from '../components/Fase/FaseList';
+import './FasesPages.css';   // Importamos los estilos
 
-const FasesPage: React.FC = () => {
+const FasesPage = () => {
   return (
     <div>
-      <h2>Fases de Estudiantes</h2>
+      <h1>Página de Fases</h1>
+      <BuscarEstudiante />
       <FaseList />
     </div>
   );

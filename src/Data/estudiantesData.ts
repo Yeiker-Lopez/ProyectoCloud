@@ -1,14 +1,21 @@
-import { IEstudiante } from "../interfaces/IEstudiantes";
+export interface Estudiante {
+  id: number;
+  nombre: string;
+  carrera: string;
+  telefono: string;
+  fase: 'Diseño' | 'Resultados';  // Agregamos fase
+  activo: boolean;                // Agregamos estado
+}
 
-export const estudiantesData: IEstudiante[] = [
-  { id: 1, nombre: "Juan Pérez", carrera: "Ingeniería TI", telefono: "0991234567" },
-  { id: 2, nombre: "Ana Gómez", carrera: "Ingeniería de Software", telefono: "0987654321" },
-  { id: 3, nombre: "Pedro Sánchez", carrera: "Ingeniería TI", telefono: "0971122334" },
-  { id: 4, nombre: "María López", carrera: "Ingeniería TI", telefono: "0965566778" },
-  { id: 5, nombre: "Luis Martínez", carrera: "Ingeniería de Software", telefono: "0959988776" },
-  { id: 6, nombre: "Sofía Rodríguez", carrera: "Ingeniería TI", telefono: "0995544332" },
-  { id: 7, nombre: "Carlos Torres", carrera: "Ingeniería de Software", telefono: "0984433221" },
-  { id: 8, nombre: "Gabriela Jiménez", carrera: "Ingeniería de Software", telefono: "0977788990" },
-  { id: 9, nombre: "Daniela Morales", carrera: "Ingeniería de Software", telefono: "0956655443" },
-  { id: 10, nombre: "Ricardo Vargas", carrera: "Ingeniería TI", telefono: "0992211445" },
+export const estudiantesData: Estudiante[] = [
+  { id: 1, nombre: 'Juan Pérez', carrera: 'Ingeniería en Sistemas', telefono: '0999999999', fase: 'Diseño', activo: true },
+  { id: 2, nombre: 'María González', carrera: 'Ingeniería en Sistemas', telefono: '0998888888', fase: 'Resultados', activo: true },
+  { id: 3, nombre: 'Carlos Ramírez', carrera: 'Ingeniería en Software', telefono: '0997777777', fase: 'Diseño', activo: true },
+  { id: 4, nombre: 'Ana Jiménez', carrera: 'Ingeniería en Software', telefono: '0996666666', fase: 'Resultados', activo: false },
+  { id: 5, nombre: 'Luis Martínez', carrera: 'Ingeniería en Sistemas', telefono: '0995555555', fase: 'Diseño', activo: true },
+  { id: 6, nombre: 'Sofía Torres', carrera: 'Ingeniería en Software', telefono: '0994444444', fase: 'Resultados', activo: true },
+  { id: 7, nombre: 'Andrés Ortiz', carrera: 'Ingeniería en Sistemas', telefono: '0993333333', fase: 'Diseño', activo: false },
+  { id: 8, nombre: 'Paula Vargas', carrera: 'Ingeniería en Software', telefono: '0992222222', fase: 'Resultados', activo: true },
+  { id: 9, nombre: 'Miguel Ríos', carrera: 'Ingeniería en Sistemas', telefono: '0991111111', fase: 'Diseño', activo: true },
+  { id: 10, nombre: 'Laura Silva', carrera: 'Ingeniería en Software', telefono: '0990000000', fase: 'Resultados', activo: false },
 ];

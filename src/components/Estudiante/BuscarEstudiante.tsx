@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { IEstudiante } from '../../interfaces/IEstudiantes';
-import { estudiantesData } from '../../Data/estudiantesData';
+import { useState } from 'react'; 
+import { estudiantesData, Estudiante } from '../../Data/estudiantesData';
 
-const BuscarEstudiante: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [results, setResults] = useState<IEstudiante[]>([]);
+const BuscarEstudiante = () => {
+  const [query, setQuery] = useState('');
+  const [result, setResult] = useState<Estudiante | null>(null);
 
-  const handleSearch = () => {
-    const filtered = estudiantesData.filter(estudiante =>
-      estudiante.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      estudiante.id.toString() === searchTerm
+  const buscarEstudiante = () => {
+    const estudianteEncontrado = estudiantesData.find(
+      (est) =>
+        est.nombre.toLowerCase() === query.toLowerCase() || 
+        est.id === Number(query)
     );
-    setResults(filtered);
+    setResult(estudianteEncontrado || null);
   };
 
   return (
@@ -19,22 +19,25 @@ const BuscarEstudiante: React.FC = () => {
       <h2>Buscar Estudiante</h2>
       <input
         type="text"
-        placeholder="Buscar por ID o Nombre"
-        value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
+        placeholder="Buscar por ID o nombre"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
       />
-      <button onClick={handleSearch}>Buscar</button>
+      <button onClick={buscarEstudiante}>Buscar</button>
 
-      <div>
-        {results.map(estudiante => (
-          <div key={estudiante.id}>
-            <h3>{estudiante.nombre}</h3>
-            <p>ID: {estudiante.id}</p>
-            <p>Carrera: {estudiante.carrera}</p>
-            <p>Teléfono: {estudiante.telefono}</p>
-          </div>
-        ))}
-      </div>
+      {result ? (
+        <div>
+          <h3>Estudiante Encontrado:</h3>
+          <p><strong>ID:</strong> {result.id}</p>
+          <p><strong>Nombre:</strong> {result.nombre}</p>
+          <p><strong>Carrera:</strong> {result.carrera}</p>
+          <p><strong>Teléfono:</strong> {result.telefono}</p>
+          <p><strong>Fase:</strong> {result.fase}</p>
+          <p><strong>Estado:</strong> {result.activo ? 'Activo' : 'Inactivo'}</p>
+        </div>
+      ) : (
+        <p>No se encontró ningún estudiante.</p>
+      )}
     </div>
   );
 };
