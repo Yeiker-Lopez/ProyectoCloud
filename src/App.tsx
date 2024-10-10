@@ -1,15 +1,18 @@
-import React from 'react';
-import EstudianteList from './components/Estudiante/EstudianteList';
-import FaseList from './components/Fase/FaseList';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './Pages/HomePage';
+import EstudiantesPage from './Pages/EstudiantesPage';
+import FasesPage from './Pages/FasesPage';
 
-const App: React.FC = () => {
+function App() {
   return (
-    <div>
-      <h1>Sistema Educativo - Comisión de Titulación</h1>
-      <EstudianteList />
-      <FaseList />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/estudiantes" element={<EstudiantesPage />} />
+        <Route path="/fases" element={<FasesPage />} />
+      </Routes>
+    </Router>
   );
-};
+}
 
 export default App;
