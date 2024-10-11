@@ -1,34 +1,39 @@
-import { estudiantesData } from '../../Data/estudiantesData';
+import React from "react";
 
-const FaseList = () => {
+interface FaseListProps {
+  students: Array<{
+    id: number;
+    nombre: string;
+    carrera: string;
+    telefono: string;
+    fase: string;
+  }>;
+}
+
+const FaseList: React.FC<FaseListProps> = ({ students }) => {
   return (
-    <div>
-      <h2>Lista de Estudiantes y sus Fases</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Carrera</th>
-            <th>Teléfono</th>
-            <th>Fase</th>
-            <th>Estado</th>
+    <table>
+      <thead>
+        <tr>
+          <th>Identificación</th>
+          <th>Nombre</th>
+          <th>Carrera</th>
+          <th>Teléfono</th>
+          <th>Fase</th>
+        </tr>
+      </thead>
+      <tbody>
+        {students.map((student) => (
+          <tr key={student.id}>
+            <td>{student.id}</td>
+            <td>{student.nombre}</td>
+            <td>{student.carrera}</td>
+            <td>{student.telefono}</td>
+            <td>{student.fase}</td>
           </tr>
-        </thead>
-        <tbody>
-          {estudiantesData.map((est) => (
-            <tr key={est.id}>
-              <td>{est.id}</td>
-              <td>{est.nombre}</td>
-              <td>{est.carrera}</td>
-              <td>{est.telefono}</td>
-              <td>{est.fase}</td>
-              <td>{est.activo ? 'Activo' : 'Inactivo'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+        ))}
+      </tbody>
+    </table>
   );
 };
 
