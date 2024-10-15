@@ -3,8 +3,7 @@ export interface Estudiante {
   nombre: string;
   carrera: string;
   telefono: string;
-  fase: 'Diseño' | 'Resultados';  // Agregamos fase
-                // Agregamos estado
+  fase: 'Diseño' | 'Resultados';  
 }
 
 export const estudiantesData: Estudiante[] = [

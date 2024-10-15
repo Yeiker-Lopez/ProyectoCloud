@@ -33,7 +33,7 @@ const BuscarEstudiante = () => {
           <p><strong>Carrera:</strong> {result.carrera}</p>
           <p><strong>Teléfono:</strong> {result.telefono}</p>
           <p><strong>Fase:</strong> {result.fase}</p>
-          <p><strong>Estado:</strong> {result.activo ? 'Activo' : 'Inactivo'}</p>
+
         </div>
       ) : (
         <p>No se encontró ningún estudiante.</p>
