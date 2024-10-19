@@ -1,9 +1,9 @@
-// src/Pages/EstudiantesPage.tsx
-import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebaseConfig";
-import "../Style/EstudiantesPage.css";
+import React, { useState, useEffect } from "react";
+import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig"; // Asegúrate de que la ruta sea correcta
+import "../Style/EstudiantesPage.css"; // Verifica que este archivo exista
 
+// Definimos la interfaz de Estudiante
 interface Estudiante {
   id: string;
   nombre: string;
@@ -13,68 +13,170 @@ interface Estudiante {
 }
 
 const EstudiantesPage: React.FC = () => {
-  const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
-  const [search, setSearch] = useState("");
+  const [students, setStudents] = useState<Estudiante[]>([]);
+  const [newStudent, setNewStudent] = useState<Partial<Estudiante>>({});
+  const [editingStudent, setEditingStudent] = useState<Estudiante | null>(null); // Para manejar la edición
+  const [errorMessage, setErrorMessage] = useState(""); // Estado para manejar mensajes de error
 
-  // Obtener estudiantes desde Firestore
+  // Cargar estudiantes al iniciar el componente
   useEffect(() => {
-    const fetchEstudiantes = async () => {
-      const querySnapshot = await getDocs(collection(db, "estudiantes"));
-      const estudiantesData = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      })) as Estudiante[];
-      setEstudiantes(estudiantesData);
+    const fetchStudents = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "estudiantes"));
+        const studentData: Estudiante[] = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Estudiante[];
+        setStudents(studentData);
+      } catch (error) {
+        console.error("Error al obtener estudiantes:", error);
+      }
     };
-    fetchEstudiantes();
+    fetchStudents();
   }, []);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
+  // Validación de campos vacíos
+  const areFieldsFilled = () => {
+    return (
+      newStudent.nombre &&
+      newStudent.carrera &&
+      newStudent.telefono &&
+      newStudent.fase
+    );
   };
 
-  const filteredStudents = estudiantes.filter(
-    (estudiante) =>
-      estudiante.nombre.toLowerCase().includes(search.toLowerCase()) ||
-      estudiante.id.includes(search)
-  );
+  // Agregar un nuevo estudiante
+  const handleAddStudent = async () => {
+    if (!areFieldsFilled()) {
+      setErrorMessage("Todos los campos son obligatorios.");
+      return; // No permitir agregar si los campos no están llenos
+    }
+
+    try {
+      const docRef = await addDoc(collection(db, "estudiantes"), newStudent);
+      setStudents([...students, { id: docRef.id, ...newStudent } as Estudiante]);
+      setNewStudent({});
+      setErrorMessage(""); // Limpiar el mensaje de error
+    } catch (error) {
+      console.error("Error al agregar estudiante:", error);
+    }
+  };
+
+  // Eliminar un estudiante
+  const handleDeleteStudent = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "estudiantes", id));
+      setStudents(students.filter((student) => student.id !== id));
+    } catch (error) {
+      console.error("Error al eliminar estudiante:", error);
+    }
+  };
+
+  // Empezar a editar un estudiante
+  const handleEditStudent = (student: Estudiante) => {
+    setEditingStudent(student);
+    setNewStudent(student);
+  };
+
+  // Actualizar un estudiante
+  const handleUpdateStudent = async () => {
+    if (!areFieldsFilled()) {
+      setErrorMessage("Todos los campos son obligatorios.");
+      return;
+    }
+
+    if (editingStudent) {
+      try {
+        const studentRef = doc(db, "estudiantes", editingStudent.id);
+        await updateDoc(studentRef, newStudent);
+        setStudents(
+          students.map((student) =>
+            student.id === editingStudent.id ? { ...student, ...newStudent } as Estudiante : student
+          )
+        );
+        setEditingStudent(null);
+        setNewStudent({});
+        setErrorMessage("");
+      } catch (error) {
+        console.error("Error al actualizar estudiante:", error);
+      }
+    }
+  };
 
   return (
-    <div className="container">
-      <h1>Lista de Estudiantes</h1>
-      <div className="search-container">
+    <div className="page-container">
+      <h1>Gestión de Estudiantes</h1>
+
+      {/* Mostrar mensaje de error si los campos están vacíos */}
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+      <div className="form-container">
         <input
           type="text"
-          placeholder="Buscar por ID o Nombre"
-          onChange={handleSearch}
+          placeholder="Nombre"
+          value={newStudent.nombre || ""}
+          onChange={(e) => setNewStudent({ ...newStudent, nombre: e.target.value })}
         />
+        <input
+          type="text"
+          placeholder="Carrera"
+          value={newStudent.carrera || ""}
+          onChange={(e) => setNewStudent({ ...newStudent, carrera: e.target.value })}
+        />
+        <input
+          type="text"
+          placeholder="Teléfono"
+          value={newStudent.telefono || ""}
+          onChange={(e) => setNewStudent({ ...newStudent, telefono: e.target.value })}
+        />
+        <input
+          type="text"
+          placeholder="Fase"
+          value={newStudent.fase || ""}
+          onChange={(e) => setNewStudent({ ...newStudent, fase: e.target.value })}
+        />
+        {editingStudent ? (
+          <button onClick={handleUpdateStudent}>Actualizar Estudiante</button>
+        ) : (
+          <button onClick={handleAddStudent}>Agregar Estudiante</button>
+        )}
       </div>
-      {filteredStudents.length === 0 ? (
-        <p className="no-results">No se encontró ningún estudiante.</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Identificación</th>
-              <th>Nombre</th>
-              <th>Carrera</th>
-              <th>Teléfono</th>
-              <th>Fase</th>
+
+      <table className="students-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Carrera</th>
+            <th>Teléfono</th>
+            <th>Fase</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {students.map((student) => (
+            <tr key={student.id}>
+              <td>{student.nombre}</td>
+              <td>{student.carrera}</td>
+              <td>{student.telefono}</td>
+              <td>{student.fase}</td>
+              <td>
+                <button
+                  onClick={() => handleDeleteStudent(student.id)}
+                  className="delete-button"
+                >
+                  Eliminar
+                </button>
+                <button
+                  onClick={() => handleEditStudent(student)}
+                  className="edit-button"
+                >
+                  Editar
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {filteredStudents.map((estudiante) => (
-              <tr key={estudiante.id}>
-                <td>{estudiante.id}</td>
-                <td>{estudiante.nombre}</td>
-                <td>{estudiante.carrera}</td>
-                <td>{estudiante.telefono}</td>
-                <td>{estudiante.fase}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
