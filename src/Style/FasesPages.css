@@ -1,20 +1,19 @@
 .container {
-  max-width: 900px;
-  margin: 0 auto;
   padding: 20px;
-  text-align: center;
+  font-family: Arial, sans-serif;
 }
 
 .search-container {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 input[type="text"] {
-  width: 300px;
   padding: 10px;
-  border-radius: 5px;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 10px;
   border: 1px solid #ccc;
-  font-size: 16px;
+  border-radius: 5px;
 }
 
 table {
@@ -24,19 +23,22 @@ table {
 }
 
 th, td {
-  padding: 12px;
   border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
 }
 
 th {
-  background-color: #f4f4f4;
+  background-color: #4CAF50;
+  color: white;
 }
 
-td {
-  text-align: center;
+tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
 
 .no-results {
   color: red;
   font-weight: bold;
+  margin-top: 10px;
 }

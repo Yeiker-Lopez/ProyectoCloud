@@ -1,32 +1,49 @@
-import React, { useState } from "react";
-import "../Pages/FasesPages.css"; // Asegúrate de que este archivo CSS exista y esté vinculado correctamente
+import React, { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore"; // Importar Firebase
+import { db } from "../firebaseConfig"; // Asegúrate de tener bien configurado Firebase
+import "../Style/FasesPages.css"; // Estilos para la página
 
-const FasesPage = () => {
+interface Estudiante {
+  id: string;
+  nombre: string;
+  carrera: string;
+  telefono: string;
+  fase: "Diseño" | "Resultados";
+}
+
+const FasesPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
-  const [students] = useState([
-    { id: 1, nombre: "Juan Pérez", carrera: "Ingeniería en sistemas", telefono: "0999999999", fase: "Diseño" },
-    { id: 2, nombre: "María González", carrera: "Ingeniería en sistemas", telefono: "0998888888", fase: "Resultados" },
-    { id: 3, nombre: 'Carlos Ramírez', carrera: 'Ingeniería en Software', telefono: '0997777777', fase: 'Diseño', activo: true },
-    { id: 4, nombre: 'Ana Jiménez', carrera: 'Ingeniería en Software', telefono: '0996666666', fase: 'Resultados', activo: false },
-    { id: 5, nombre: 'Luis Martínez', carrera: 'Ingeniería en Sistemas', telefono: '0995555555', fase: 'Diseño', activo: true },
-    { id: 6, nombre: 'Sofía Torres', carrera: 'Ingeniería en Software', telefono: '0994444444', fase: 'Resultados', activo: true },
-    { id: 7, nombre: 'Andrés Ortiz', carrera: 'Ingeniería en Sistemas', telefono: '0993333333', fase: 'Diseño', activo: false },
-    { id: 8, nombre: 'Paula Vargas', carrera: 'Ingeniería en Software', telefono: '0992222222', fase: 'Resultados', activo: true },
-    { id: 9, nombre: 'Miguel Ríos', carrera: 'Ingeniería en Sistemas', telefono: '0991111111', fase: 'Diseño', activo: true },
-    { id: 10, nombre: 'Laura Silva', carrera: 'Ingeniería en Software', telefono: '0990000000', fase: 'Resultados', activo: false },
-    // Añade más estudiantes aquí
-  ]);
+  const [students, setStudents] = useState<Estudiante[]>([]); // Estado para los estudiantes
 
-  // Función para manejar el cambio en el input de búsqueda
+  // Cargar los estudiantes desde Firebase
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "estudiantes"));
+        const studentsData: Estudiante[] = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Estudiante[];
+        setStudents(studentsData);
+      } catch (error) {
+        console.error("Error al obtener estudiantes:", error);
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
+  // Manejar el cambio en el input de búsqueda
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
-  // Filtrar los estudiantes en base al nombre o ID que el usuario introduce
+  // Filtrar estudiantes por nombre, ID o fase
   const filteredStudents = students.filter(
     (student) =>
       student.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.id.toString().includes(searchTerm)
+      student.id.toString().includes(searchTerm) ||
+      student.fase.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -37,13 +54,13 @@ const FasesPage = () => {
       <div className="search-container">
         <input
           type="text"
-          placeholder="Buscar por ID o Nombre"
+          placeholder="Buscar por ID, Nombre o Fase"
           value={searchTerm}
           onChange={handleSearch}
         />
       </div>
 
-      {/* Mostrar mensaje si no hay estudiantes encontrados */}
+      {/* Mostrar mensaje si no se encuentran estudiantes */}
       {filteredStudents.length === 0 ? (
         <p className="no-results">No se encontró ningún estudiante.</p>
       ) : (

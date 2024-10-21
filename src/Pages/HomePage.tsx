@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './HomePage.css';
+import '../Style/HomePage.css';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,10 +18,10 @@ const HomePage: React.FC = () => {
       <h1>Bienvenido al Sistema Educativo</h1>
       <div className="buttons">
         <button onClick={goToEstudiantes} className="button">
-          Ver Estudiantes
+          Gestionar Estudiantes
         </button>
         <button onClick={goToFases} className="button">
-          Ver Fases
+          Consultar
         </button>
       </div>
     </div>

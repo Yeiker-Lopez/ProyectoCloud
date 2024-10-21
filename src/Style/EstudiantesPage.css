@@ -1,58 +1,32 @@
-.edit-button {
-  background-color: #4CAF50;
+/* Estilo para la cabecera de la tabla */
+thead tr {
+  background-color: #4CAF50; /* Verde */
   color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  font-weight: bold;
+  text-align: left;
 }
 
-.edit-button:hover {
-  background-color: #45a049;
+/* Opcional: Filas alternadas para mejor legibilidad */
+tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
 
-.delete-button {
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.delete-button:hover {
-  background-color: #d32f2f;
-}
-
-.form-container input {
-  margin: 5px;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  width: 100%;
-  max-width: 200px;
-}
-
-.students-table {
+/* Estilo general de la tabla */
+table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
 }
 
-.students-table th, .students-table td {
-  padding: 10px;
-  border: 1px solid #ddd;
-  text-align: left;
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
 }
 
-.students-table th {
-  background-color: #f2f2f2;
-  .error-message {
-    color: red;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  
+.search-container input {
+  padding: 8px;
+  margin-bottom: 15px;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
 }
