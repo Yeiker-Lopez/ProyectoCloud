@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { db } from "../firebaseConfig"; // Asegúrate de que la ruta sea correcta
-import "../Style/EstudiantesPage.css"; // Verifica que este archivo exista
+import { db } from "../firebaseConfig"; 
+import "../Style/EstudiantesPage.css"; 
 
-// Definimos la interfaz de Estudiante
+
 interface Estudiante {
   id: string;
   nombre: string;
@@ -15,10 +15,10 @@ interface Estudiante {
 const EstudiantesPage: React.FC = () => {
   const [students, setStudents] = useState<Estudiante[]>([]);
   const [newStudent, setNewStudent] = useState<Partial<Estudiante>>({});
-  const [editingStudent, setEditingStudent] = useState<Estudiante | null>(null); // Para manejar la edición
-  const [errorMessage, setErrorMessage] = useState(""); // Estado para manejar mensajes de error
+  const [editingStudent, setEditingStudent] = useState<Estudiante | null>(null); 
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // Cargar estudiantes al iniciar el componente
+  
   useEffect(() => {
     const fetchStudents = async () => {
       try {
@@ -34,6 +34,7 @@ const EstudiantesPage: React.FC = () => {
     };
     fetchStudents();
   }, []);
+  
 
   // Validación de campos vacíos
   const areFieldsFilled = () => {
@@ -49,14 +50,14 @@ const EstudiantesPage: React.FC = () => {
   const handleAddStudent = async () => {
     if (!areFieldsFilled()) {
       setErrorMessage("Todos los campos son obligatorios.");
-      return; // No permitir agregar si los campos no están llenos
+      return; 
     }
 
     try {
       const docRef = await addDoc(collection(db, "estudiantes"), newStudent);
       setStudents([...students, { id: docRef.id, ...newStudent } as Estudiante]);
       setNewStudent({});
-      setErrorMessage(""); // Limpiar el mensaje de error
+      setErrorMessage(""); 
     } catch (error) {
       console.error("Error al agregar estudiante:", error);
     }

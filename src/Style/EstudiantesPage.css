@@ -1,17 +1,15 @@
-/* Estilo para la cabecera de la tabla */
+
 thead tr {
-  background-color: #4CAF50; /* Verde */
+  background-color: #4CAF50; 
   color: white;
   font-weight: bold;
   text-align: left;
 }
 
-/* Opcional: Filas alternadas para mejor legibilidad */
 tbody tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-/* Estilo general de la tabla */
 table {
   width: 100%;
   border-collapse: collapse;

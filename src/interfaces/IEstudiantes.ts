@@ -3,5 +3,6 @@ export interface IEstudiante {
     nombre: string;
     carrera: string;
     telefono: string;
+    fase: "Diseño" | "Resultados";
   }
   
