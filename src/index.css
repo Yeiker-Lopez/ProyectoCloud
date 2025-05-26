@@ -40,9 +40,7 @@ div:hover {
   gap: 1rem;
 }
 
-h3 {
-  color: #0066cc;
-}
+
 
 .EstudiantesList div, .FasesList div {
   border-left: 4px solid #0066cc;

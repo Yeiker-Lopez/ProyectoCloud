@@ -46,7 +46,7 @@ const EstudiantesPage: React.FC = () => {
     );
   };
 
-  // Agregar un nuevo estudiante
+
   const handleAddStudent = async () => {
     if (!areFieldsFilled()) {
       setErrorMessage("Todos los campos son obligatorios.");
@@ -63,7 +63,6 @@ const EstudiantesPage: React.FC = () => {
     }
   };
 
-  // Eliminar un estudiante
   const handleDeleteStudent = async (id: string) => {
     try {
       await deleteDoc(doc(db, "estudiantes", id));
@@ -73,7 +72,7 @@ const EstudiantesPage: React.FC = () => {
     }
   };
 
-  // Empezar a editar un estudiante
+  // editar un estudiante
   const handleEditStudent = (student: Estudiante) => {
     setEditingStudent(student);
     setNewStudent(student);
@@ -115,25 +114,25 @@ const EstudiantesPage: React.FC = () => {
         <input
           type="text"
           placeholder="Nombre"
-          value={newStudent.nombre || ""}
+          value={newStudent.nombre ?? ""}
           onChange={(e) => setNewStudent({ ...newStudent, nombre: e.target.value })}
         />
         <input
           type="text"
           placeholder="Carrera"
-          value={newStudent.carrera || ""}
+          value={newStudent.carrera ?? ""}
           onChange={(e) => setNewStudent({ ...newStudent, carrera: e.target.value })}
         />
         <input
           type="text"
           placeholder="Teléfono"
-          value={newStudent.telefono || ""}
+          value={newStudent.telefono ?? ""}
           onChange={(e) => setNewStudent({ ...newStudent, telefono: e.target.value })}
         />
         <input
           type="text"
           placeholder="Fase"
-          value={newStudent.fase || ""}
+          value={newStudent.fase ?? ""}
           onChange={(e) => setNewStudent({ ...newStudent, fase: e.target.value })}
         />
         {editingStudent ? (
