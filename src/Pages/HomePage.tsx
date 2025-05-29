@@ -15,7 +15,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="homepage">
-      <h1>Bienvenido al Sistema Educativo</h1>
+      <h1>Sistema Gestión Educativo</h1>
       <div className="buttons">
         <button onClick={goToEstudiantes} className="button">
           Gestionar Estudiantes
