@@ -125,7 +125,7 @@ const EstudiantesPage: React.FC = () => {
         />
         <input
           type="text"
-          placeholder="Teléfono"
+          placeholder="celular"
           value={newStudent.telefono ?? ""}
           onChange={(e) => setNewStudent({ ...newStudent, telefono: e.target.value })}
         />
