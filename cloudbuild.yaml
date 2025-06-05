@@ -1,11 +1,11 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   - name: 'gcr.io/cloud-builders/npm'
-    args: ['ci']
-
+    args: ['install']
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
 
-artifacts:
-  objects:
-    location: 'gs://proyecto-practica-cloud/build/'
-    paths: ['dist/**']
+images:
+  - 'gcr.io/$PROJECT_ID/mi-aplicacion'
