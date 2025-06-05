@@ -1,0 +1,11 @@
+steps:
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['ci']
+  
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']
+
+artifacts:
+  objects:
+    location: 'gs://proyecto-practica-cloud/build/'
+    paths: ['dist/**']
