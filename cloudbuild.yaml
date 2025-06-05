@@ -1,8 +1,28 @@
-options:
-  logging: CLOUD_LOGGING_ONLY
-
+# cloudbuild.yaml
 steps:
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['install']
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['run', 'build']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/my-nginx-app:$COMMIT_SHA', '.']
+  id: Build
+  # Builds the Docker image.
+  # Replace 'my-nginx-app' with your desired application name.
+  # $PROJECT_ID and $COMMIT_SHA are automatic Cloud Build variables.
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/my-nginx-app:$COMMIT_SHA']
+  id: Push
+  # Pushes the built image to Google Container Registry (GCR) or Artifact Registry.
+
+- name: 'gcr.io/google.com/cloudsdk/cloud-sdk'
+  args:
+  - gcloud
+  - run
+  - deploy
+  - my-nginx-app # Your Cloud Run service name (can be different from image name)
+  - --image=gcr.io/$PROJECT_ID/my-nginx-app:$COMMIT_SHA
+  - --platform=managed
+  - --region=us-central1 # IMPORTANT: Choose the region where you want to deploy
+  - --allow-unauthenticated # If you want it publicly accessible
+  - --port=8080 # IMPORTANT: This MUST match the EXPOSE port in your Dockerfile
+  id: DeployToCloudRun
+  # Deploys the image to Cloud Run.
+  # Make sure the '--port' matches your Dockerfile's EXPOSE port.
