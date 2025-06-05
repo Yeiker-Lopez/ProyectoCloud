@@ -1,182 +1,179 @@
-import React, { useState, useEffect } from "react";
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { db } from "../firebaseConfig"; 
-import "../Style/EstudiantesPage.css"; 
+import React, { useEffect, useState } from "react";
+import { IEstudiante } from "../interfaces/IEstudiantes";
+import { db } from "../firebaseConfig";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 
+// ────────────────────────────── Estrategias ────────────────────────────── //
+interface FaseStrategy {
+  obtenerMensaje(estudiante: IEstudiante): string;
+  obtenerColor(): string;
+}
 
-interface Estudiante {
-  id: string;
-  nombre: string;
-  carrera: string;
-  telefono: string;
-  fase: string;
+class FaseDisenoStrategy implements FaseStrategy {
+  obtenerMensaje(estudiante: IEstudiante): string {
+    return `🛠️ ${estudiante.nombre} está en la fase de diseño.`;
+  }
+
+  obtenerColor(): string {
+    return "#cce5ff";
+  }
+}
+
+class FaseResultadosStrategy implements FaseStrategy {
+  obtenerMensaje(estudiante: IEstudiante): string {
+    return `📊 ${estudiante.nombre} está en la fase de resultados.`;
+  }
+
+  obtenerColor(): string {
+    return "#d4edda";
+  }
+}
+
+class FaseContext {
+  private estrategia: FaseStrategy;
+
+  constructor(fase: "Diseño" | "Resultados") {
+    this.estrategia =
+      fase === "Diseño"
+        ? new FaseDisenoStrategy()
+        : new FaseResultadosStrategy();
+  }
+
+  mostrarMensaje(estudiante: IEstudiante): string {
+    return this.estrategia.obtenerMensaje(estudiante);
+  }
+
+  obtenerColor(): string {
+    return this.estrategia.obtenerColor();
+  }
 }
 
 const EstudiantesPage: React.FC = () => {
-  const [students, setStudents] = useState<Estudiante[]>([]);
-  const [newStudent, setNewStudent] = useState<Partial<Estudiante>>({});
-  const [editingStudent, setEditingStudent] = useState<Estudiante | null>(null); 
-  const [errorMessage, setErrorMessage] = useState("");
+  const [estudiantes, setEstudiantes] = useState<IEstudiante[]>([]);
+  const [form, setForm] = useState<Omit<IEstudiante, "id">>({
+    nombre: "",
+    carrera: "",
+    telefono: "",
+    fase: "Diseño",
+  });
+  const [editandoId, setEditandoId] = useState<string | null>(null);
 
-  
+  const cargarEstudiantes = async () => {
+    const querySnapshot = await getDocs(collection(db, "estudiantes"));
+    const data: IEstudiante[] = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Omit<IEstudiante, "id">),
+    }));
+    setEstudiantes(data);
+  };
+
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "estudiantes"));
-        const studentData: Estudiante[] = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Estudiante[];
-        setStudents(studentData);
-      } catch (error) {
-        console.error("Error al obtener estudiantes:", error);
-      }
-    };
-    fetchStudents();
+    cargarEstudiantes();
   }, []);
-  
 
-  // Validación de campos vacíos
-  const areFieldsFilled = () => {
-    return (
-      newStudent.nombre &&
-      newStudent.carrera &&
-      newStudent.telefono &&
-      newStudent.fase
-    );
+  const manejarCambio = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-
-  const handleAddStudent = async () => {
-    if (!areFieldsFilled()) {
-      setErrorMessage("Todos los campos son obligatorios.");
-      return; 
+  const manejarSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editandoId) {
+      const ref = doc(db, "estudiantes", editandoId);
+      await updateDoc(ref, form);
+      setEditandoId(null);
+    } else {
+      await addDoc(collection(db, "estudiantes"), form);
     }
-
-    try {
-      const docRef = await addDoc(collection(db, "estudiantes"), newStudent);
-      setStudents([...students, { id: docRef.id, ...newStudent } as Estudiante]);
-      setNewStudent({});
-      setErrorMessage(""); 
-    } catch (error) {
-      console.error("Error al agregar estudiante:", error);
-    }
+    setForm({ nombre: "", carrera: "", telefono: "", fase: "Diseño" });
+    cargarEstudiantes();
   };
 
-  const handleDeleteStudent = async (id: string) => {
-    try {
-      await deleteDoc(doc(db, "estudiantes", id));
-      setStudents(students.filter((student) => student.id !== id));
-    } catch (error) {
-      console.error("Error al eliminar estudiante:", error);
-    }
+  const manejarEditar = (est: IEstudiante) => {
+    setForm({ nombre: est.nombre, carrera: est.carrera, telefono: est.telefono, fase: est.fase });
+    setEditandoId(est.id);
   };
 
-  // editar un estudiante
-  const handleEditStudent = (student: Estudiante) => {
-    setEditingStudent(student);
-    setNewStudent(student);
-  };
-
-  // Actualizar un estudiante
-  const handleUpdateStudent = async () => {
-    if (!areFieldsFilled()) {
-      setErrorMessage("Todos los campos son obligatorios.");
-      return;
-    }
-
-    if (editingStudent) {
-      try {
-        const studentRef = doc(db, "estudiantes", editingStudent.id);
-        await updateDoc(studentRef, newStudent);
-        setStudents(
-          students.map((student) =>
-            student.id === editingStudent.id ? { ...student, ...newStudent } as Estudiante : student
-          )
-        );
-        setEditingStudent(null);
-        setNewStudent({});
-        setErrorMessage("");
-      } catch (error) {
-        console.error("Error al actualizar estudiante:", error);
-      }
-    }
+  const manejarEliminar = async (id: string) => {
+    await deleteDoc(doc(db, "estudiantes", id));
+    cargarEstudiantes();
   };
 
   return (
-    <div className="page-container">
+    <div style={{ padding: "2rem" }}>
       <h1>Gestión de Estudiantes</h1>
 
-      {/* Mostrar mensaje de error si los campos están vacíos */}
-      {errorMessage && <p className="error-message">{errorMessage}</p>}
-
-      <div className="form-container">
+      {/* Formulario */}
+      <form onSubmit={manejarSubmit} style={{ marginBottom: "2rem", display: "grid", gap: "0.5rem" }}>
         <input
           type="text"
+          name="nombre"
+          value={form.nombre}
+          onChange={manejarCambio}
           placeholder="Nombre"
-          value={newStudent.nombre ?? ""}
-          onChange={(e) => setNewStudent({ ...newStudent, nombre: e.target.value })}
+          required
         />
         <input
           type="text"
+          name="carrera"
+          value={form.carrera}
+          onChange={manejarCambio}
           placeholder="Carrera"
-          value={newStudent.carrera ?? ""}
-          onChange={(e) => setNewStudent({ ...newStudent, carrera: e.target.value })}
+          required
         />
         <input
-          type="text"
-          placeholder="celular"
-          value={newStudent.telefono ?? ""}
-          onChange={(e) => setNewStudent({ ...newStudent, telefono: e.target.value })}
+          type="tel"
+          name="telefono"
+          value={form.telefono}
+          onChange={manejarCambio}
+          placeholder="Teléfono"
+          required
         />
-        <input
-          type="text"
-          placeholder="Fase"
-          value={newStudent.fase ?? ""}
-          onChange={(e) => setNewStudent({ ...newStudent, fase: e.target.value })}
-        />
-        {editingStudent ? (
-          <button onClick={handleUpdateStudent}>Actualizar Estudiante</button>
-        ) : (
-          <button onClick={handleAddStudent}>Agregar Estudiante</button>
+        <select name="fase" value={form.fase} onChange={manejarCambio}>
+          <option value="Diseño">Diseño</option>
+          <option value="Resultados">Resultados</option>
+        </select>
+        <button type="submit">{editandoId ? "Actualizar" : "Agregar"}</button>
+        {editandoId && (
+          <button type="button" onClick={() => {
+            setEditandoId(null);
+            setForm({ nombre: "", carrera: "", telefono: "", fase: "Diseño" });
+          }}>
+            Cancelar
+          </button>
         )}
-      </div>
+      </form>
 
-      <table className="students-table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Carrera</th>
-            <th>Teléfono</th>
-            <th>Fase</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {students.map((student) => (
-            <tr key={student.id}>
-              <td>{student.nombre}</td>
-              <td>{student.carrera}</td>
-              <td>{student.telefono}</td>
-              <td>{student.fase}</td>
-              <td>
-                <button
-                  onClick={() => handleDeleteStudent(student.id)}
-                  className="delete-button"
-                >
-                  Eliminar
-                </button>
-                <button
-                  onClick={() => handleEditStudent(student)}
-                  className="edit-button"
-                >
-                  Editar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Lista de estudiantes */}
+      {estudiantes.map((est) => {
+        const contexto = new FaseContext(est.fase);
+        return (
+          <div
+            key={est.id}
+            style={{
+              backgroundColor: contexto.obtenerColor(),
+              padding: "1rem",
+              borderRadius: "10px",
+              marginBottom: "1rem",
+              boxShadow: "0 0 5px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h2>{est.nombre}</h2>
+            <p><strong>Carrera:</strong> {est.carrera}</p>
+            <p><strong>Teléfono:</strong> {est.telefono}</p>
+            <p><strong>Fase:</strong> {est.fase}</p>
+            <p><em>{contexto.mostrarMensaje(est)}</em></p>
+            <button onClick={() => manejarEditar(est)}>Editar</button>{" "}
+            <button onClick={() => manejarEliminar(est.id)}>Eliminar</button>
+          </div>
+        );
+      })}
     </div>
   );
 };

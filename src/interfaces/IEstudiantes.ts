@@ -1,5 +1,5 @@
 export interface IEstudiante {
-    id: number;
+    id: string;
     nombre: string;
     carrera: string;
     telefono: string;
